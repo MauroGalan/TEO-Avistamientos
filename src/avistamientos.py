@@ -37,7 +37,16 @@ def lee_avistamientos(fichero :str) -> list[Avistamiento]:
     @return: lista de tuplas con la información de los avistamientos 
     @rtype: [Avistamiento(datetime, str, str, str, str, int, str, Coordenadas(float, float))]   
     '''
-    pass
+    with open (fichero, encoding="utf-8") as f:
+        res = []
+        lector = csv.reader(f)
+        next(lector)
+        for fechahora,ciudad,estado,forma,duracion,comentarios,latitud,longitud in lector:
+            fechahora=datetime.strptime(fechahora,'%m/%d/%Y %H:%M')
+            duracion = int(duracion)
+            ubicacion = Coordenadas(float(latitud),float(longitud))
+            res.append(Avistamiento(fechahora,ciudad,estado,forma,duracion,comentarios,ubicacion))
+        return res
 
 ### 2.1 Número de avistamientos producidos en una fecha
 def numero_avistamientos_fecha(avistamientos: list[Avistamiento], fecha: datetime.date) -> int:
@@ -54,12 +63,16 @@ def numero_avistamientos_fecha(avistamientos: list[Avistamiento], fecha: datetim
     @rtype: int
     
     '''
-    pass
-
+    num = 0
+    for avis in avistamientos:
+        if avis.fechahora.date() == fecha:
+            num +=1
+    return num
 
 # Por comprensión
 def numero_avistamientos_fecha2(avistamientos: list[Avistamiento], fecha: datetime.date) -> int:
-    pass
+    return len(["Avistamiento" for avis in avistamientos if avis.fechahora.date() == fecha])
+
 
 ### 2.2 Número de formas observadas en un conjunto de estados
 def formas_estados(avistamientos: list[Avistamiento], estados: set[str]) -> int:
@@ -134,12 +147,17 @@ def avistamiento_mayor_duracion(avistamientos: list[Avistamiento], forma: str) -
     @return:  avistamiento más largo de la forma dada
     @rtype: Avistamiento(datetime, str, str, str, int, str, Coordenadas(float, float))
     '''
-    pass
+    avistamiento_forma= []
+    for avis in avistamientos:
+        if avis.forma == forma:
+            avistamiento_forma.append(avis)
     
-
+    return max(avistamiento_forma, key= lambda avis:avis.duracion)
+    
 def avistamiento_mayor_duracion2(avistamientos: list[Avistamiento], forma: str) -> Avistamiento:
     # Por comprension
-    pass
+    return max((avis for avis in avistamientos if avis.forma== forma),key = lambda avis:avis.duracion)
+
 
 ### 3.2 Avistamiento cercano a un punto con mayor duración
 def avistamiento_cercano_mayor_duracion(avistamientos: list[Avistamiento], coordenadas: Coordenadas, radio: float = 0.5) -> tuple[int, str]:
@@ -193,7 +211,11 @@ def avistamientos_fechas(avistamientos: list[Avistamiento], fecha_inicial: date|
     @rtype: [Avistamiento(datetime, str, str, str, int, str, Coordenadas(float, float))]
     '''
     # Solución 1: usando datetime.min/max
-    pass
+    avistamiento_fechas = []
+    for avis in avistamientos:
+        if (fecha_inicial == None or fecha_inicial<=avis.fechahora.date()) and (fecha_final == None or fecha_final >= avis.fechahora.date()):
+            avistamiento_fechas.append(avis)
+    return sorted(avistamiento_fechas,key=lambda avis:avis.fechahora,reverse=True)
 
 def avistamientos_fechas2(avistamientos: list[Avistamiento], fecha_inicial: date|None =None, fecha_final: date|None =None) -> list[Avistamiento]:
     # Solución 2: usando una función auxiliar : fecha_en_rango
@@ -231,7 +253,11 @@ def comentario_mas_largo(avistamientos: list[Avistamiento], anyo: int, palabra: 
     @return: avistamiento con el comentario más largo
     @rtype: Avistamiento(datetime, str, str, str, int, str, Coordenadas(float, float))
     '''    
-    pass
+    avistamiento_filtrado=[]
+    for avis in avistamientos:
+        if avis.fechahora.year == anyo and palabra.lower() in avis.comentarios.lower():
+            avistamiento_filtrado.append(avis)
+    return max(avistamiento_filtrado, key= lambda avis:len(avis.comentarios))
     
 def comentario_mas_largo2(avistamientos: list[Avistamiento], anyo: int, palabra: str) -> Avistamiento:
     # Por comprensión

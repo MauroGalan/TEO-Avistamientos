@@ -158,7 +158,7 @@ def main():
 
     avistamientos = av.lee_avistamientos("data/ovnis.csv")
     test_lee_avistamientos (avistamientos)
-
+"""
     ### 2.1 ##########################################################
     print("2.1" , "#"*70)
     fecha = datetime(2005, 5, 1).date()
@@ -258,6 +258,6 @@ def main():
     ### 4.13 ##########################################################
     print("4.13" , "#"*70)
     test_avistamiento_mas_reciente_por_estado(avistamientos)
-
+"""
 if __name__=="__main__":
     main()
